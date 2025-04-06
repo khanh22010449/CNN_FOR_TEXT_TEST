@@ -8,10 +8,10 @@ version = "1.0.0"
 description = ""
 license = "Apache-2.0"
 dependencies = [
-    "flwr[simulation]>=1.11.1",
-    "flwr-datasets[vision]>=0.3.0",
-    "torch>=2.2.1",
-    "torchvision>=0.17.1",
+    "flwr[simulation]==1.13.1",
+    "flwr-datasets[vision]==0.3.0",
+    "torch==2.2.1",
+    "torchvision==0.17.1",
     "ray>=2.10.0",
     "wandb==0.17.8",
     "toml>=0.10.2"  # Thêm toml vào dependencies
@@ -24,8 +24,8 @@ packages = ["."]
 publisher = "CNN_TEXT"
 
 [tool.flwr.app.components]
-serverapp = "CNN_TEXT.server:app"
-clientapp = "CNN_TEXT.client:app"
+serverapp = "CNN_TEXT.server_app:app"
+clientapp = "CNN_TEXT.client_app:app"
 
 [tool.flwr.app.config]
 num-server-rounds = 50
