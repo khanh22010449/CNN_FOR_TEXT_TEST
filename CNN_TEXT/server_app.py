@@ -11,6 +11,8 @@ import torch
 from torch.utils.data import DataLoader
 import itertools
 import time
+import toml  # Thêm import toml để xử lý file .toml
+import os
 
 def measure_time(func, *args, **kwargs):
     start_time = time.time()
@@ -64,7 +66,39 @@ def find_best_params(device: torch.device, epochs: int = 5) -> dict:
             }
     
     print(f"Best params: {best_params}, Best accuracy: {best_accuracy:.4f}")
+    
+    # Cập nhật pyproject.toml với tham số tối ưu
+    with open("pyproject.toml", "r") as f:
+        config = toml.load(f)
+    
+    # Thêm hoặc cập nhật phần [tool.flwr.app.config.model-params]
+    if "tool" not in config:
+        config["tool"] = {}
+    if "flwr" not in config["tool"]:
+        config["tool"]["flwr"] = {}
+    if "app" not in config["tool"]["flwr"]:
+        config["tool"]["flwr"]["app"] = {}
+    if "config" not in config["tool"]["flwr"]["app"]:
+        config["tool"]["flwr"]["app"]["config"] = {}
+    
+    config["tool"]["flwr"]["app"]["config"]["model-params"] = best_params
+    
+    with open("pyproject.toml", "w") as f:
+        toml.dump(config, f)
+    print("Saved best parameters to pyproject.toml under [tool.flwr.app.config.model-params]")
+    
     return best_params
+
+def load_best_params() -> dict:
+    """Đọc tham số tối ưu từ pyproject.toml nếu tồn tại."""
+    if os.path.exists("pyproject.toml"):
+        with open("pyproject.toml", "r") as f:
+            config = toml.load(f)
+        best_params = config.get("tool", {}).get("flwr", {}).get("app", {}).get("config", {}).get("model-params")
+        if best_params:
+            print("Loaded best parameters from pyproject.toml")
+            return best_params
+    raise FileNotFoundError("Model parameters not found in pyproject.toml. Please run parameter optimization first.")
 
 def gen_evaluate_fn(testloader: DataLoader, device: torch.device, config: dict):
     def evaluate(server_round, parameters_ndarrays, config_dict):
@@ -97,8 +131,11 @@ def server_fn(context: Context):
     num_rounds = context.run_config["num-server-rounds"]
     fraction_fit = context.run_config["fraction-fit"]
 
-    # Tìm tham số tối ưu
-    best_params = find_best_params(device, epochs=5)
+    # Kiểm tra nếu đã có model-params trong pyproject.toml thì đọc, nếu không thì tìm mới
+    try:
+        best_params = load_best_params()
+    except FileNotFoundError:
+        best_params = find_best_params(device, epochs=5)
 
     # Tải testloader với max_length tối ưu
     trainloader, testloader, _ = load_data(best_params["max_length"])
@@ -117,8 +154,8 @@ def server_fn(context: Context):
 
     strategy = CustomFedAvg(
         run_config=context.run_config,
-        use_wandb=context.run_config["use-wandb"],
-        model_params=best_params,  # Truyền tham số tối ưu vào strategy
+        use_wandb=context.run_config.get("use-wandb", False),
+        model_params=best_params,
         fraction_fit=fraction_fit,
         fraction_evaluate=0.5,
         min_available_clients=2,
