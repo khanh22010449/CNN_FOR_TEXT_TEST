@@ -30,7 +30,7 @@ clientapp = "CNN_TEXT.client_app:app"
 num-server-rounds = 30
 fraction-fit = 0.5
 local-epochs = 100
-server-device = "cpu"
+server-device = "cuda:1"
 use-wandb = true
 
 [tool.flwr.federations]
@@ -41,5 +41,5 @@ options.num-supernodes = 20
 
 [tool.flwr.federations.localhost-gpu]
 options.num-supernodes = 100
-options.backend.client-resources.num-cpus = 4 # each ClientApp assumes to use 4CPUs
+options.backend.client-resources.num-cpus = 1 # each ClientApp assumes to use 4CPUs
 options.backend.client-resources.num-gpus = 0.25 # at most 4 ClientApps will run in a given GPU
