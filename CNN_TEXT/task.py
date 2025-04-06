@@ -71,9 +71,9 @@ def load_data(partition_id: int, num_partitions: int, max_length: int):
     partition_train_test = partition_train_test.with_transform(apply_tensor)
 
     trainloader = DataLoader(
-        partition_train_test["train"], batch_size=32, shuffle=True, num_workers=8
+        partition_train_test["train"], batch_size=32, shuffle=True
     )
-    valloader = DataLoader(partition_train_test["test"], batch_size=32, num_workers=8)
+    valloader = DataLoader(partition_train_test["test"], batch_size=32)
     return trainloader, valloader, len(global_vocab)
 
 class TextCNN(nn.Module):

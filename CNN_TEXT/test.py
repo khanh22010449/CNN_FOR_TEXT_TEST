@@ -53,8 +53,8 @@ def load_data(max_length: int):
     test_split = test_split.with_transform(apply_tensor)
 
     # Tạo DataLoader
-    trainloader = DataLoader(train_data, batch_size=32, shuffle=True, num_workers=8)
-    valloader = DataLoader(test_split["test"], batch_size=32, num_workers=8)
+    trainloader = DataLoader(train_data, batch_size=32, shuffle=True)
+    valloader = DataLoader(test_split["test"], batch_size=32)
     return trainloader, valloader, vocab_size
 
 if __name__ == "__main__":
