@@ -25,7 +25,7 @@ def build_global_vocab(num_partitions: int):
     global fds, global_vocab
     if fds is None:
         partitioner = IidPartitioner(num_partitions=num_partitions)
-        fds = FederatedDataset(dataset="notaphoenix/shakespeare_dataset", partitioners={"training": partitioner})
+        fds = FederatedDataset(dataset="stanfordnlp/imdb", partitioners={"train": partitioner})
     
     if global_vocab is None:
         all_words = []
