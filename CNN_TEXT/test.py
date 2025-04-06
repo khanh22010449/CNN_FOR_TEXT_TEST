@@ -12,8 +12,8 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 def load_data(max_length: int):
     # Tải dữ liệu từ dataset
-    dataset = load_dataset("stanfordnlp/imdb")
-    train_data = dataset["train"]
+    dataset = load_dataset("notaphoenix/shakespeare_dataset")
+    train_data = dataset["training"]
     test_data = dataset["test"]
 
     # Xây dựng vocabulary từ tập train

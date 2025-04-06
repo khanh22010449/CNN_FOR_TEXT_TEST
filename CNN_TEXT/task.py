@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from flwr_datasets import FederatedDataset
-from flwr_datasets.partitioner import IidPartitioner
+from flwr_datasets.partitioner import IidPartitioner, DirichletPartitioner
 import numpy as np
 from collections import Counter
 from flwr.common.logger import log
@@ -24,8 +24,15 @@ global_vocab = None
 def build_global_vocab(num_partitions: int):
     global fds, global_vocab
     if fds is None:
-        partitioner = IidPartitioner(num_partitions=num_partitions)
-        fds = FederatedDataset(dataset="stanfordnlp/imdb", partitioners={"train": partitioner})
+        # partitioner = IidPartitioner(num_partitions=num_partitions)
+        partitioner = DirichletPartitioner(
+            num_partitions=num_partitions,
+            partition_by="label",
+            alpha=0.3,
+            seed=42,
+            min_partition_size=150,
+        )
+        fds = FederatedDataset(dataset="notaphoenix/shakespeare_dataset", partitioners={"training": partitioner})
     
     if global_vocab is None:
         all_words = []

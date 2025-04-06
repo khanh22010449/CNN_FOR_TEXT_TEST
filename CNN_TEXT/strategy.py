@@ -9,7 +9,7 @@ from flwr.common import logger, parameters_to_ndarrays
 from flwr.common.typing import UserConfig
 from flwr.server.strategy import FedAvg
 
-PROJECT_NAME = "CNN for TEXT"
+PROJECT_NAME = "CNN for TEXT - shakespeare dataset - DirichletPartitioner"
 
 class CustomFedAvg(FedAvg):
     def __init__(self, run_config: UserConfig, use_wandb: bool, model_params: dict, *args, **kwargs):
