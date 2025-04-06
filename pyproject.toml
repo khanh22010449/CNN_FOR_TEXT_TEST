@@ -30,7 +30,7 @@ clientapp = "CNN_TEXT.client_app:app"
 num-server-rounds = 30
 fraction-fit = 0.5
 local-epochs = 100
-server-device = "cuda:1"
+server-device = "cuda:0"
 use-wandb = true
 
 [tool.flwr.federations]
