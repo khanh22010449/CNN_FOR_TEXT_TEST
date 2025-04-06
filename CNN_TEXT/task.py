@@ -30,7 +30,7 @@ def build_global_vocab(num_partitions: int):
             partition_by="label",
             alpha=0.3,
             seed=42,
-            min_partition_size=150,
+            min_partition_size=50,
         )
         fds = FederatedDataset(dataset="notaphoenix/shakespeare_dataset", partitioners={"training": partitioner})
     
