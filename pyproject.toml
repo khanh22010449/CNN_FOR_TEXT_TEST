@@ -34,13 +34,6 @@ local-epochs = 100
 server-device = "cpu"
 use-wandb = true
 
-[tool.flwr.app.config.model-params]  # Phần này sẽ được thêm bởi server
-vocab_size = 50000  # Ví dụ, giá trị thực tế sẽ được server cập nhật
-embedding_dim = 256
-num_filters = 128
-kernel_size = 3
-max_length = 512
-
 [tool.flwr.federations]
 default = "local-simulation"
 
