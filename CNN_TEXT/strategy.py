@@ -7,12 +7,20 @@ import wandb
 from CNN_TEXT.task import TextCNN, create_run_dir, set_weights
 from flwr.common import logger, parameters_to_ndarrays
 from flwr.common.typing import UserConfig
-from flwr.server.strategy import FedAvg
+from flwr.server.strategy import FedAvg, FedAdam, FedProx, FedAvgM
 
-PROJECT_NAME = "CNN for TEXT - shakespeare dataset - DirichletPartitioner"
+PROJECT_NAME = "CNN for TEXT - FedAvg - stanfordnlp_imdb - DirichletPartitioner"
+
 
 class CustomFedAvg(FedAvg):
-    def __init__(self, run_config: UserConfig, use_wandb: bool, model_params: dict, *args, **kwargs):
+    def __init__(
+        self,
+        run_config: UserConfig,
+        use_wandb: bool,
+        model_params: dict,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.save_path, self.run_dir = create_run_dir(run_config)
         self.use_wandb = use_wandb
@@ -50,7 +58,9 @@ class CustomFedAvg(FedAvg):
             torch.save(model.state_dict(), self.save_path / file_name)
 
     def store_results_and_log(self, server_round: int, tag: str, results_dict):
-        self._store_results(tag=tag, results_dict={"round": server_round, **results_dict})
+        self._store_results(
+            tag=tag, results_dict={"round": server_round, **results_dict}
+        )
         if self.use_wandb:
             wandb.log(results_dict, step=server_round)
 

@@ -23,17 +23,24 @@ clientapp = "CNN_TEXT.client_app:app"
 num-server-rounds = 50
 fraction-fit = 0.5
 local-epochs = 100
-server-device = "cpu"
+server-device = "cuda:0"
 use-wandb = true
 
-[tool.hatch.build.targets.wheel]
-packages = [ ".",]
+[tool.flwr.app.config.model-params]
+vocab_size = 280618
+embedding_dim = 256
+num_filters = 256
+kernel_size = 2
+max_length = 1024
 
 [tool.flwr.federations.local-simulation.options]
 num-supernodes = 50
 
 [tool.flwr.federations.localhost-gpu.options]
-num-supernodes = 50
+num-supernodes = 100
+
+[tool.hatch.build.targets.wheel]
+packages = [ ".",]
 
 [tool.flwr.federations.localhost-gpu.options.backend.client-resources]
 num-cpus = 1

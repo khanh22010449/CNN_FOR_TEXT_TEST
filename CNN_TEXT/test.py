@@ -10,10 +10,11 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+
 def load_data(max_length: int):
     # Tải dữ liệu từ dataset
-    dataset = load_dataset("notaphoenix/shakespeare_dataset")
-    train_data = dataset["training"]
+    dataset = load_dataset("stanfordnlp/imdb")
+    train_data = dataset["train"]
     test_data = dataset["test"]
 
     # Xây dựng vocabulary từ tập train
@@ -56,6 +57,7 @@ def load_data(max_length: int):
     trainloader = DataLoader(train_data, batch_size=32, shuffle=True)
     valloader = DataLoader(test_split["test"], batch_size=32)
     return trainloader, valloader, vocab_size
+
 
 if __name__ == "__main__":
     trainloader, valloader, vocab_size = load_data(512)

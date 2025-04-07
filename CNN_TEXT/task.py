@@ -21,6 +21,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 fds = None
 global_vocab = None
 
+
 def build_global_vocab(num_partitions: int):
     global fds, global_vocab
     if fds is None:
@@ -32,28 +33,36 @@ def build_global_vocab(num_partitions: int):
             seed=42,
             min_partition_size=10,
         )
-        fds = FederatedDataset(dataset="notaphoenix/shakespeare_dataset", partitioners={"training": partitioner})
-    
+        fds = FederatedDataset(
+            dataset="stanfordnlp/imdb", partitioners={"train": partitioner}
+        )
+
     if global_vocab is None:
         all_words = []
         for partition_id in range(num_partitions):
             partition = fds.load_partition(partition_id=partition_id)
-            all_words.extend(word for text in partition["text"] for word in text.split())
+            all_words.extend(
+                word for text in partition["text"] for word in text.split()
+            )
         word_counts = Counter(all_words)
-        global_vocab = {word: i + 1 for i, (word, _) in enumerate(word_counts.most_common())}
+        global_vocab = {
+            word: i + 1 for i, (word, _) in enumerate(word_counts.most_common())
+        }
         global_vocab["<PAD>"] = 0
         log(INFO, f"Global vocab size: {len(global_vocab)}")
+
 
 def load_data(partition_id: int, num_partitions: int, max_length: int):
     global fds, global_vocab
     if global_vocab is None:
         build_global_vocab(num_partitions)
-    
+
     partition = fds.load_partition(partition_id=partition_id)
 
     def tokenize_and_pad(batch):
         sequences = [
-            [global_vocab.get(word, 0) for word in text.split()] for text in batch["text"]
+            [global_vocab.get(word, 0) for word in text.split()]
+            for text in batch["text"]
         ]
         padded_sequences = [
             (
@@ -77,11 +86,10 @@ def load_data(partition_id: int, num_partitions: int, max_length: int):
     partition_train_test = partition.train_test_split(test_size=0.2, seed=42)
     partition_train_test = partition_train_test.with_transform(apply_tensor)
 
-    trainloader = DataLoader(
-        partition_train_test["train"], batch_size=32, shuffle=True
-    )
+    trainloader = DataLoader(partition_train_test["train"], batch_size=32, shuffle=True)
     valloader = DataLoader(partition_train_test["test"], batch_size=32)
     return trainloader, valloader, len(global_vocab)
+
 
 class TextCNN(nn.Module):
     def __init__(self, vocab_size, embedding_dim, num_filters, kernel_size, max_length):
@@ -102,6 +110,7 @@ class TextCNN(nn.Module):
         x = self.fc(x)
         return x
 
+
 def train(net, trainloader, epochs: int, device):
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(net.parameters(), lr=5e-5)
@@ -120,6 +129,7 @@ def train(net, trainloader, epochs: int, device):
     avg_loss = total_loss / len(trainloader)
     print(f"Epoch {epoch + 1}/{epochs}, Loss: {avg_loss:.4f}")
     return avg_loss
+
 
 def test(net, valloader, device):
     net.eval()
@@ -142,13 +152,16 @@ def test(net, valloader, device):
     print(f"Validation Accuracy: {accuracy:.4f}")
     return avg_loss, accuracy
 
+
 def get_weights(model):
     return [val.cpu().numpy() for _, val in model.state_dict().items()]
+
 
 def set_weights(model, parameters):
     params_dict = zip(model.state_dict().keys(), parameters)
     state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
     model.load_state_dict(state_dict, strict=True)
+
 
 def create_run_dir(config: UserConfig) -> Path:
     current_time = datetime.now()
@@ -158,6 +171,7 @@ def create_run_dir(config: UserConfig) -> Path:
     with open(f"{save_path}/run_config.json", "w", encoding="utf-8") as fp:
         json.dump(config, fp)
     return save_path, run_dir
+
 
 if __name__ == "__main__":
     for i in range(10):
