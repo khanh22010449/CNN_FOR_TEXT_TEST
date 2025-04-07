@@ -28,9 +28,9 @@ def build_global_vocab(num_partitions: int):
         partitioner = DirichletPartitioner(
             num_partitions=num_partitions,
             partition_by="label",
-            alpha=0.3,
+            alpha=1.0,
             seed=42,
-            min_partition_size=50,
+            min_partition_size=10,
         )
         fds = FederatedDataset(dataset="notaphoenix/shakespeare_dataset", partitioners={"training": partitioner})
     

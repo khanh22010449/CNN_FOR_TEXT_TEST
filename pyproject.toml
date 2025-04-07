@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = [ "hatchling",]
 build-backend = "hatchling.build"
 
 [project]
@@ -7,21 +7,13 @@ name = "CNN_TEXT"
 version = "1.0.0"
 description = ""
 license = "Apache-2.0"
-dependencies = [
-    "flwr[simulation]==1.13.1",
-    "flwr-datasets[vision]==0.3.0",
-    "torch==2.2.1",
-    "torchvision==0.17.1",
-    "ray>=2.10.0",
-    "wandb==0.17.8",
-    "toml>=0.10.2"  # Thêm toml vào dependencies
-]
-
-[tool.hatch.build.targets.wheel]
-packages = ["."]
+dependencies = [ "flwr[simulation]==1.13.1", "flwr-datasets[vision]==0.3.0", "torch==2.2.1", "torchvision==0.17.1", "ray>=2.10.0", "wandb==0.17.8", "toml>=0.10.2",]
 
 [tool.flwr.app]
 publisher = "CNN_TEXT"
+
+[tool.flwr.federations]
+default = "local-simulation"
 
 [tool.flwr.app.components]
 serverapp = "CNN_TEXT.server_app:app"
@@ -34,13 +26,15 @@ local-epochs = 100
 server-device = "cpu"
 use-wandb = true
 
-[tool.flwr.federations]
-default = "local-simulation"
+[tool.hatch.build.targets.wheel]
+packages = [ ".",]
 
-[tool.flwr.federations.local-simulation]
-options.num-supernodes = 20
+[tool.flwr.federations.local-simulation.options]
+num-supernodes = 50
 
-[tool.flwr.federations.localhost-gpu]
-options.num-supernodes = 100
-options.backend.client-resources.num-cpus = 1
-options.backend.client-resources.num-gpus = 0.25
+[tool.flwr.federations.localhost-gpu.options]
+num-supernodes = 50
+
+[tool.flwr.federations.localhost-gpu.options.backend.client-resources]
+num-cpus = 1
+num-gpus = 0.25
