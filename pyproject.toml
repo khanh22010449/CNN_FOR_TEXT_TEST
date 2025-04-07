@@ -29,9 +29,9 @@ use-wandb = true
 [tool.flwr.app.config.model-params]
 vocab_size = 280618
 embedding_dim = 256
-num_filters = 256
-kernel_size = 2
-max_length = 1024
+num_filters = 128
+kernel_size = 3
+max_length = 512
 
 [tool.flwr.federations.local-simulation.options]
 num-supernodes = 50
