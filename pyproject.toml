@@ -37,7 +37,7 @@ max_length = 1024
 num-supernodes = 50
 
 [tool.flwr.federations.localhost-gpu.options]
-num-supernodes = 100
+num-supernodes = 50
 
 [tool.hatch.build.targets.wheel]
 packages = [ ".",]
